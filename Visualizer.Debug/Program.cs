@@ -25,11 +25,7 @@ namespace Visualizer.Debug
                 person
             };
 
-            DebuggerSide.TestShowVisualizer(new List<Person>
-            {
-                personOld,
-                person
-            });
+            DebuggerSide.TestShowVisualizer(person);
         }
     }
 }

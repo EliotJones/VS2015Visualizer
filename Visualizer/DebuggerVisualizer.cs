@@ -1,12 +1,15 @@
 ﻿using Microsoft.VisualStudio.DebuggerVisualizers;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Windows.Forms;
 using Domain.Core;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using Visualizer;
 
-[assembly: DebuggerVisualizer(typeof(Visualizer.DebuggerSide), typeof(VisualizerObjectSource),
-        Target = typeof(List<>), Description = "Person Visualizer")]
+[assembly: DebuggerVisualizer(typeof(DebuggerSide), typeof(PersonObjectSource),
+        Target = typeof(Person), Description = "Person Visualizer")]
 namespace Visualizer
 {
     public class DebuggerSide : DialogDebuggerVisualizer
@@ -15,18 +18,29 @@ namespace Visualizer
         {
             try
             {
-                var person = objectProvider.GetObject() as List<Person>;
-
-                if (person == null)
+                using (var reader = new StreamReader(objectProvider.GetData()))
                 {
-                    MessageBox.Show("Cannot visualize this object, please use a different visualizer.", "Type Not Supported", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    var result = reader.ReadToEnd();
 
-                    return;
+
+
+                    var person = JsonConvert.DeserializeObject<Person>(result, new JsonSerializerSettings
+                    {
+                        ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
+                        ContractResolver = new PrivatePropertyResolver()
+                    });
+
+                    if (person == null)
+                    {
+                        MessageBox.Show("Cannot visualize this object, please use a different visualizer.", "Type Not Supported", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                        return;
+                    }
+
+                    var window = new MainWindow(person);
+
+                    window.ShowDialog();
                 }
-
-                var window = new MainWindow(person[0]);
-
-                window.ShowDialog();
             }
             catch (Exception ex)
             {
@@ -37,7 +51,7 @@ namespace Visualizer
 
         public static void TestShowVisualizer(object thingToVisualize)
         {
-            var visualizerHost = new VisualizerDevelopmentHost(thingToVisualize, typeof(DebuggerSide));
+            var visualizerHost = new VisualizerDevelopmentHost(thingToVisualize, typeof(DebuggerSide), typeof(PersonObjectSource));
             visualizerHost.ShowVisualizer();
         }
     }

@@ -1,8 +1,7 @@
 ﻿namespace Domain.Core
 {
     using System;
-
-    [Serializable]
+    
     public class Person
     {
         public Guid Id { get; private set; }
@@ -26,6 +25,10 @@
             LastName = lastName;
             BirthDate = birthDate;
             FavoriteColor = favoriteColor;
+        }
+
+        private Person()
+        {
         }
     }
 }
