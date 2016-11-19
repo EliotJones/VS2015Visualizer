@@ -1,4 +1,6 @@
-﻿namespace Visualizer
+﻿using Domain.Core;
+
+namespace Visualizer
 {
     using System.ComponentModel;
     using System.Reflection;
@@ -6,9 +8,9 @@
 
     internal partial class MainWindow
     {
-        public MainWindow(string value)
+        public MainWindow(Person person)
         {
-            DataContext = new MainWindowViewModel(value);
+            DataContext = new MainWindowViewModel(person);
 
             InitializeComponent();
         }

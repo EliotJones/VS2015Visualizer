@@ -1,4 +1,6 @@
-﻿namespace Visualizer.Debug
+﻿using Domain.Core;
+
+namespace Visualizer.Debug
 {
     using System;
 
@@ -7,9 +9,13 @@
         [STAThread]
         public static void Main()
         {
-            const string data = "test";
+            var person = new Person("Jim", "Paul", new DateTime(1970, 5, 25), "Blue");
 
-            DebuggerSide.TestShowVisualizer(data);
+            DebuggerSide.TestShowVisualizer(person);
+
+            var personOld = new Person("Jane", "Smith", new DateTime(1925, 7, 27), "Green");
+
+            DebuggerSide.TestShowVisualizer(personOld);
         }
     }
 }

@@ -1,9 +1,11 @@
 ﻿using Microsoft.VisualStudio.DebuggerVisualizers;
 using System;
 using System.Diagnostics;
+using System.Windows.Forms;
+using Domain.Core;
 
 [assembly: DebuggerVisualizer(typeof(Visualizer.DebuggerSide), typeof(VisualizerObjectSource),
-        Target = typeof(string), Description = "Visualizer")]
+        Target = typeof(Domain.Core.Person), Description = "Person Visualizer")]
 namespace Visualizer
 {
     public class DebuggerSide : DialogDebuggerVisualizer
@@ -12,7 +14,16 @@ namespace Visualizer
         {
             try
             {
-                var window = new MainWindow(objectProvider.GetObject().ToString());
+                var person = objectProvider.GetObject() as Person;
+
+                if (person == null)
+                {
+                    MessageBox.Show("Cannot visualize this object", "Failed");
+
+                    return;
+                }
+
+                var window = new MainWindow(person);
 
                 window.ShowDialog();
             }

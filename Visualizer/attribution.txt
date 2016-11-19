@@ -1,0 +1,2 @@
+﻿icons from:
+By Google - https://code.google.com/p/noto/, Apache License 2.0, https://commons.wikimedia.org/w/index.php?curid=34844323

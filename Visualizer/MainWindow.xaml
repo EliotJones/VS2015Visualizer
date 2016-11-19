@@ -10,14 +10,51 @@
              x:ClassModifier="internal">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="5"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="5"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        
-        <TextBlock Grid.Row="1" Text="{Binding Value}"/>
-        
-        <DataGrid Grid.Row="3" ItemsSource="{Binding Characters}"/>
+
+        <Grid x:Name="PersonDetails" Height="120" Width="300">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="20"/>
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="50"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="190"/>
+                <ColumnDefinition Width="20"/>
+            </Grid.ColumnDefinitions>
+
+            <Image Grid.Row="1" Grid.Column="1" Width="50" Height="50" Source="{Binding Icon}"/>
+
+            <Grid Grid.Column="3" Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="60"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0">
+                    <TextBlock FontWeight="Bold">Name: </TextBlock><TextBlock Text="{Binding Name}"/>
+                </TextBlock>
+
+                <Grid Grid.Row="1" x:Name="ColorGrid">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="25"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Rectangle Grid.Column="0" Width="25" Height="25" Fill="{Binding Color}"/>
+
+                    <TextBlock Grid.Column="1">
+                        <TextBlock>Favorite color: </TextBlock>
+                        <TextBlock Text="{Binding FavoriteColor}"/>
+                    </TextBlock>
+                </Grid>
+            </Grid>
+        </Grid>
     </Grid>
 </Window>
