@@ -1,4 +1,5 @@
-﻿using Domain.Core;
+﻿using System.Collections.Generic;
+using Domain.Core;
 
 namespace Visualizer.Debug
 {
@@ -11,11 +12,24 @@ namespace Visualizer.Debug
         {
             var person = new Person("Jim", "Paul", new DateTime(1970, 5, 25), "Blue");
 
-            DebuggerSide.TestShowVisualizer(person);
-
             var personOld = new Person("Jane", "Smith", new DateTime(1925, 7, 27), "Green");
+            
+            var numberList = new List<int>
+            {
+                1, 2, 3
+            };
 
-            DebuggerSide.TestShowVisualizer(personOld);
+            var list = new List<Person>
+            {
+                personOld,
+                person
+            };
+
+            DebuggerSide.TestShowVisualizer(new List<Person>
+            {
+                personOld,
+                person
+            });
         }
     }
 }

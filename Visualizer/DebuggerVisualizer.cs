@@ -1,11 +1,12 @@
 ﻿using Microsoft.VisualStudio.DebuggerVisualizers;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Forms;
 using Domain.Core;
 
 [assembly: DebuggerVisualizer(typeof(Visualizer.DebuggerSide), typeof(VisualizerObjectSource),
-        Target = typeof(Domain.Core.Person), Description = "Person Visualizer")]
+        Target = typeof(List<>), Description = "Person Visualizer")]
 namespace Visualizer
 {
     public class DebuggerSide : DialogDebuggerVisualizer
@@ -14,16 +15,16 @@ namespace Visualizer
         {
             try
             {
-                var person = objectProvider.GetObject() as Person;
+                var person = objectProvider.GetObject() as List<Person>;
 
                 if (person == null)
                 {
-                    MessageBox.Show("Cannot visualize this object", "Failed");
+                    MessageBox.Show("Cannot visualize this object, please use a different visualizer.", "Type Not Supported", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                     return;
                 }
 
-                var window = new MainWindow(person);
+                var window = new MainWindow(person[0]);
 
                 window.ShowDialog();
             }
