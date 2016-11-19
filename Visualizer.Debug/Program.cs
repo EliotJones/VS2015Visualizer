@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Domain.Core;
 
 namespace Visualizer.Debug
@@ -26,6 +27,10 @@ namespace Visualizer.Debug
             };
 
             DebuggerSide.TestShowVisualizer(person);
+
+            var regex = new Regex(".+");
+
+            var match = regex.Matches("tony");
         }
     }
 }
