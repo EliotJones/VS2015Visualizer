@@ -6,42 +6,80 @@
     using System.Reflection;
     using System.Text.RegularExpressions;
     using System.Windows.Documents;
+    using System.Windows.Input;
     using System.Windows.Media;
     using RegexViewModels;
     using WpfHelpers;
 
     internal class MainWindowViewModel : ViewModelBase
     {
-        private const int MYSTERY_OFFSET = 2;
-        private readonly Regex _regex;
-        private readonly string _originalText;
+        private const int MysteryOffset = 2;
+        private readonly Regex regex;
+        private readonly string originalText;
 
         public string Pattern { get; set; }
 
-        private FlowDocument _document;
+        private FlowDocument document;
         public FlowDocument Document
         {
-            get { return _document; }
-            private set { SetProperty(ref _document, value); }
+            get { return document; }
+            private set { SetProperty(ref document, value); }
         }
 
         public ObservableCollection<Match> Matches { get; }
         
-        private Match _selectedMatch;
+        private Match selectedMatch;
         public Match SelectedMatch
         {
-            get { return _selectedMatch; }
+            get { return selectedMatch; }
             set
             {
-                SetProperty(ref _selectedMatch, value);
+                SetProperty(ref selectedMatch, value);
                 if (value != null)
                 {
                     SelectionChanged();
                 }
+                else
+                {
+                    SelectedGroup = null;
+                }
             }
         }
 
-        public ObservableCollection<GroupViewModel> Groups { get; } = new ObservableCollection<GroupViewModel>(); 
+        public ObservableCollection<GroupViewModel> Groups { get; } = new ObservableCollection<GroupViewModel>();
+
+        private GroupViewModel selectedGroup;
+        public GroupViewModel SelectedGroup
+        {
+            get { return selectedGroup; }
+            set
+            {
+                SetProperty(ref selectedGroup, value);
+                if (value != null)
+                {
+                    GroupChanged();
+                }
+            }
+        }
+
+        public ObservableCollection<CaptureViewModel> Captures { get; } = new ObservableCollection<CaptureViewModel>();
+
+        private void GroupChanged()
+        {
+            if (SelectedGroup == null)
+            {
+                return;
+            }
+
+            Captures.Clear();
+
+            foreach (var captureViewModel in SelectedGroup.Captures)
+            {
+                Captures.Add(captureViewModel);
+            }
+
+            Document = PopulateDocument();
+        }
 
         public MainWindowViewModel(MatchCollection matchCollection)
         {
@@ -51,10 +89,10 @@
             }
 
             var matches = matchCollection.Cast<Match>().ToArray();
-            _regex = GetOriginalRegex(matchCollection);
-            _originalText = GetOriginalInput(matchCollection);
+            regex = GetOriginalRegex(matchCollection);
+            originalText = GetOriginalInput(matchCollection);
 
-            Pattern = _regex?.ToString();
+            Pattern = regex?.ToString();
 
             Matches = new ObservableCollection<Match>(matches);
 
@@ -71,34 +109,68 @@
             Document = PopulateDocument();
             Groups.Clear();
 
-            var groups = GroupViewModel.Create(_regex, SelectedMatch);
+            Mouse.OverrideCursor = Cursors.Wait;
 
-            foreach (var groupViewModel in groups)
+            try
             {
-                Groups.Add(groupViewModel);
+                var groups = GroupViewModel.Create(regex, SelectedMatch);
+
+                foreach (var groupViewModel in groups)
+                {
+                    Groups.Add(groupViewModel);
+                }
             }
+            catch (Exception)
+            {
+                // ignored
+            }
+
+            Mouse.OverrideCursor = null;
         }
 
         private FlowDocument PopulateDocument()
         {
-            var document = new FlowDocument();
-            var range = new TextRange(document.ContentStart, document.ContentEnd)
+            var updatedDocument = new FlowDocument();
+            
+            // ReSharper disable once UnusedVariable
+            var range = new TextRange(updatedDocument.ContentStart, updatedDocument.ContentEnd)
             {
-                Text = _originalText
+                Text = originalText
             };
 
-            if (SelectedMatch != null)
+            if (SelectedMatch == null)
             {
-                var start = document.ContentStart.DocumentStart.GetPositionAtOffset(SelectedMatch.Index + MYSTERY_OFFSET);
-                var end =
-                    document.ContentStart.DocumentStart.GetPositionAtOffset(SelectedMatch.Length + SelectedMatch.Index + MYSTERY_OFFSET);
-
-                var matchRange = new TextRange(start, end);
-
-                matchRange.ApplyPropertyValue(TextElement.BackgroundProperty, new SolidColorBrush(Colors.Lime));
+                return updatedDocument;
             }
 
-            return document;
+            if (SelectedGroup != null)
+            {
+                var start = SelectedGroup.Index + MysteryOffset;
+                var end = SelectedGroup.Index + SelectedGroup.Value.Length + MysteryOffset;
+
+                HighlightRange(updatedDocument, start, end, Colors.Aqua);
+            }
+            else
+            {
+
+                var start = SelectedMatch.Index + MysteryOffset;
+                var end = SelectedMatch.Length + SelectedMatch.Index + MysteryOffset;
+                
+                HighlightRange(updatedDocument, start, end, Colors.Lime);
+            }
+
+            return updatedDocument;
+        }
+
+        private static void HighlightRange(FlowDocument updatedDocument, int start, int end, Color color)
+        {
+            var startPointer = updatedDocument.ContentStart.DocumentStart.GetPositionAtOffset(start);
+            var endPointer =
+                updatedDocument.ContentStart.DocumentStart.GetPositionAtOffset(end);
+
+            var matchRange = new TextRange(startPointer, endPointer);
+
+            matchRange.ApplyPropertyValue(TextElement.BackgroundProperty, new SolidColorBrush(color));
         }
 
         private static Regex GetOriginalRegex(MatchCollection matchCollection)
@@ -119,6 +191,11 @@
             var result = inputFieldInfo?.GetValue(matchCollection)?.ToString() ?? string.Empty;
 
             return result;
+        }
+
+        public void Deselect()
+        {
+            SelectedMatch = null;
         }
     }
 }

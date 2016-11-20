@@ -7,6 +7,8 @@
 
     internal class GroupViewModel : ViewModelBase
     {
+        public IReadOnlyList<CaptureViewModel> Captures { get; }
+
         public int MatchIndex { get; }
 
         public string Name { get; set; }
@@ -21,6 +23,8 @@
             MatchIndex = matchIndex;
             Name = name;
             Value = group.Value;
+            Captures = group.Captures.Cast<Capture>()
+                .Select((x, i) => new CaptureViewModel(i, x)).ToList();
         }
 
         public static IReadOnlyList<GroupViewModel> Create(Regex regex, Match match)

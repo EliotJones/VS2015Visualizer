@@ -12,7 +12,8 @@
         WindowStartupLocation="CenterOwner"
         Background="LightGray"
         Width="600"
-        Height="390">
+        Height="390"
+        KeyDown="MainWindow_OnKeyDown">
     <Window.Resources>
         <Color x:Key="Background">#ecf0f1</Color>
         <Color x:Key="Border">#bdc3c7</Color>
@@ -28,8 +29,8 @@
         </Grid.RowDefinitions>
 
         <Border BorderBrush="{StaticResource BorderBrush}" Grid.Row="0" BorderThickness="0 0 0 1">
-            <StackPanel Orientation="Horizontal" Background="{StaticResource BackgroundBrush}" HorizontalAlignment="Stretch">
-                <Label Content="_Pattern: " FontSize="14" Target="Pattern" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
+            <StackPanel Orientation="Vertical" Background="{StaticResource BackgroundBrush}" HorizontalAlignment="Stretch">
+                <Label Content="_Pattern: " FontSize="12" FontWeight="Bold" Target="Pattern" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
                 <TextBox x:Name="Pattern" IsReadOnly="True" Text="{Binding Pattern}" Margin="3" MinWidth="100"/>
             </StackPanel>
         </Border>
@@ -55,7 +56,7 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <Label FontSize="12" FontWeight="Bold">Matches</Label>
+                    <Label FontSize="12" FontWeight="Bold">Matches: </Label>
 
                     <ListBox Grid.Row="1"
                          Margin="3"
@@ -84,9 +85,41 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <Label Grid.Row="0" FontSize="12" FontWeight="Bold">Groups</Label>
+                        <Label Grid.Row="0" FontSize="12" FontWeight="Bold">Groups: </Label>
 
                         <DataGrid Margin="3" Grid.Row="1" ItemsSource="{Binding Groups}" 
+                                  HorizontalGridLinesBrush="{StaticResource BorderBrush}"
+                                  VerticalGridLinesBrush="{StaticResource BorderBrush}"
+                                  AutoGenerateColumns="False"
+                                  SelectedItem="{Binding SelectedGroup}">
+                            <DataGrid.CellStyle>
+                                <Style TargetType="DataGridCell">
+                                    <Setter Property="Padding" Value="5"/>
+                                </Style>
+                            </DataGrid.CellStyle>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Width="20" IsReadOnly="True" Header="" Binding="{Binding MatchIndex}"/>
+                                <DataGridTextColumn Width="*" IsReadOnly="True" Header="Name" Binding="{Binding Name}"/>
+                                <DataGridTextColumn Width="*" IsReadOnly="True" Header="Value" Binding="{Binding Value}"/>
+                                <DataGridTextColumn Width="Auto" IsReadOnly="True" Header="Start" Binding="{Binding Index}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+
+                <Border Grid.Column="1" Background="{StaticResource BackgroundBrush}" BorderBrush="{StaticResource BorderBrush}"
+                        BorderThickness="0 0 1 0"
+                        Visibility="{Binding SelectedGroup, Converter={StaticResource NullToVisibilityConverter}}">
+
+                    <Grid x:Name="CapturesGrid">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Label Grid.Row="0" FontSize="12" FontWeight="Bold">Captures: </Label>
+
+                        <DataGrid Margin="3" Grid.Row="1" ItemsSource="{Binding Captures}" 
                                   HorizontalGridLinesBrush="{StaticResource BorderBrush}"
                                   VerticalGridLinesBrush="{StaticResource BorderBrush}"
                                   AutoGenerateColumns="False">
@@ -96,8 +129,7 @@
                                 </Style>
                             </DataGrid.CellStyle>
                             <DataGrid.Columns>
-                                <DataGridTextColumn Width="20" IsReadOnly="True" Header="" Binding="{Binding MatchIndex}"/>
-                                <DataGridTextColumn Width="*" IsReadOnly="True" Header="Name" Binding="{Binding Name}"/>
+                                <DataGridTextColumn Width="20" IsReadOnly="True" Header="" Binding="{Binding CaptureIndex}"/>
                                 <DataGridTextColumn Width="*" IsReadOnly="True" Header="Value" Binding="{Binding Value}"/>
                                 <DataGridTextColumn Width="Auto" IsReadOnly="True" Header="Start" Binding="{Binding Index}"/>
                             </DataGrid.Columns>
